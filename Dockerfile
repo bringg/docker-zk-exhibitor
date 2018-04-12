@@ -1,62 +1,46 @@
-FROM java:alpine
-MAINTAINER Alex Simenduev <shamil.si@gmail.com>
+# build gcsfuse
+FROM golang:1.10-alpine as gcsfuse
+RUN apk add --no-cache git musl-dev \
+    && go get -v -u github.com/googlecloudplatform/gcsfuse
 
-# Args for built time overrides
-ARG EXHIBITOR_VERSION="1.5.6"
-ARG MVN_VERSION="3.3.9"
-ARG ZK_VERSION="3.4.8"
+# build exhibitor
+FROM maven:3.5.3-jdk-8-alpine as exhibitor
 
-ENV \
-    BUILD_DEPS="go git" \
-    EXHIBITOR_POM="https://raw.githubusercontent.com/Netflix/exhibitor/v$EXHIBITOR_VERSION/exhibitor-standalone/src/main/resources/buildscripts/standalone/maven/pom.xml" \
-    MVN_RELEASE="http://www.apache.org/dist/maven/maven-3/$MVN_VERSION/binaries/apache-maven-$MVN_VERSION-bin.tar.gz" \
-    ZK_RELEASE="http://www.apache.org/dist/zookeeper/zookeeper-$ZK_VERSION/zookeeper-$ZK_VERSION.tar.gz"
+ARG EXHIBITOR_VERSION="1.7.0"
+ENV EXHIBITOR_RELEASE="https://github.com/soabase/exhibitor/archive/exhibitor-$EXHIBITOR_VERSION.tar.gz"
 
-# Use one step so we can remove intermediate dependencies and minimize size
+RUN wget -qO- $EXHIBITOR_RELEASE | tar -xvz -C / \
+    && ln -s /exhibitor* /exhibitor \
+    && cd /exhibitor \
+    && mvn -DskipTests=true install \
+    && sed -i "s/<version>1\..\.0/<version>$EXHIBITOR_VERSION/" exhibitor-standalone/src/main/resources/buildscripts/standalone/maven/pom.xml \
+    && mvn -f exhibitor-standalone/src/main/resources/buildscripts/standalone/maven/pom.xml package
+
+FROM openjdk:8-jdk-alpine
+LABEL maintainer "Bringg DevOps <devops@bringg.com>"
+
+ARG EXHIBITOR_VERSION="1.7.0"
+ARG ZK_VERSION="3.4.10"
+ENV ZK_RELEASE="http://www.apache.org/dist/zookeeper/zookeeper-$ZK_VERSION/zookeeper-$ZK_VERSION.tar.gz"
+
 RUN \
     # Install required packages
-    apk add --no-cache bash fuse $BUILD_DEPS \
-
-    # Default DNS cache TTL is -1. DNS records, like, change, man.
-    && sed -i 's/^#*\(networkaddress.cache.ttl\).*/\1=60/' /usr/lib/jvm/default-jvm/jre/lib/security/java.security \
-
+    apk add --no-cache bash fuse \
+    \
     # Alpine doesn't have /opt dir
     && mkdir -p /opt \
-
+    \
     # Install ZK
-    && wget -O /tmp/zookeeper.tgz $ZK_RELEASE \
-    && tar -xvzf /tmp/zookeeper.tgz -C /opt/ \
-    && ln -s /opt/zookeeper-* /opt/zookeeper \
-    && rm /tmp/zookeeper.tgz \
+    && wget -qO- $ZK_RELEASE | tar -xvz -C /opt \
+    && ln -s /opt/zookeeper-* /opt/zookeeper
 
-    # Install maven
-    && wget -O /tmp/apache-maven.tgz $MVN_RELEASE \
-    && tar -xvzf /tmp/apache-maven.tgz -C /opt/ \
-    && ln -s /opt/apache-maven-* /opt/apache-maven \
-    && rm /tmp/apache-maven.tgz \
+# Add the optional web.xml for authentication and the wrapper script to setup configs
+COPY include/ /opt/exhibitor/
 
-    # Install Exhibitor
-    && mkdir -p /opt/exhibitor \
-    && wget -O /opt/exhibitor/pom.xml $EXHIBITOR_POM \
-    && /opt/apache-maven/bin/mvn -f /opt/exhibitor/pom.xml package \
-    && ln -s /opt/exhibitor/target/exhibitor*jar /opt/exhibitor/exhibitor.jar \
-
-    # Install gcsfuse
-    && GOPATH=/tmp/go GO15VENDOREXPERIMENT=1 go get -u github.com/googlecloudplatform/gcsfuse \
-    && mv /tmp/go/bin/gcsfuse /usr/local/bin/ \
-    && rm -Rf /tmp/go \
-
-    # Remove build-time dependencies
-    && apk del --no-cache $BUILD_DEPS \
-    && rm -Rf /opt/apache-maven* ~/.m2
-
-# Add the optional web.xml for authentication
-ADD include/web.xml /opt/exhibitor/web.xml
-
-# Add the wrapper script to setup configs and exec exhibitor
-ADD include/wrapper.sh /opt/exhibitor/wrapper.sh
+# Copy files from build containers
+COPY --from=gcsfuse /go/bin/gcsfuse /usr/local/bin/
+COPY --from=exhibitor /exhibitor/exhibitor-standalone/src/main/resources/buildscripts/standalone/maven/target/exhibitor-$EXHIBITOR_VERSION.jar /opt/exhibitor/exhibitor.jar
 
 WORKDIR /opt/exhibitor
 EXPOSE 2181 2888 3888 8181
-
 ENTRYPOINT ["bash", "-ex", "/opt/exhibitor/wrapper.sh"]
