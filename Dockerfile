@@ -4,7 +4,7 @@ RUN apk add --no-cache git musl-dev \
     && go get -v -u github.com/googlecloudplatform/gcsfuse
 
 # build exhibitor
-FROM maven:3.5.3-jdk-8-alpine as exhibitor
+FROM maven:3.5-alpine as exhibitor
 
 ARG EXHIBITOR_VERSION="1.7.0"
 ENV EXHIBITOR_RELEASE="https://github.com/soabase/exhibitor/archive/exhibitor-$EXHIBITOR_VERSION.tar.gz"
