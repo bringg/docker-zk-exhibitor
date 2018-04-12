@@ -1,8 +1,8 @@
-Runs an [Exhibitor](https://github.com/Netflix/exhibitor)-managed [ZooKeeper](http://zookeeper.apache.org/) instance using S3 or GCS for backups and automatic node discovery.
+Runs an [Exhibitor](https://github.com/soabase/exhibitor/)-managed [ZooKeeper](http://zookeeper.apache.org/) instance using S3 or GCS for backups and automatic node discovery.
 
-Available on the Docker Index as [simenduev/zookeeper-exhibitor](https://index.docker.io/u/simenduev/zookeeper-exhibitor/):
+Based on the Docker Index as [simenduev/zookeeper-exhibitor](https://index.docker.io/u/simenduev/zookeeper-exhibitor/):
 
-    docker pull simenduev/zookeeper-exhibitor
+    docker pull bringg/zookeeper-exhibitor
 
 ### Why to Fork?
 
@@ -16,8 +16,8 @@ The fork add support for the following:
 * Allow to specify settling-period (`ZK_SETTLING_PERIOD`)
 
 ### Versions
-* Exhibitor 1.5.6
-* ZooKeeper 3.4.8
+* Exhibitor 1.7.0
+* ZooKeeper 3.4.10
 
 ### Usage
 The container expects the following environment variables to be passed in:
@@ -47,7 +47,7 @@ Starting the container:
         -e AWS_ACCESS_KEY_ID=<access_key> \
         -e AWS_SECRET_ACCESS_KEY=<secret_key> \
         -e HOSTNAME=<host> \
-        simenduev/zookeeper-exhibitor:latest
+        bringg/zookeeper-exhibitor:latest
 
 Once the container is up, confirm Exhibitor is running:
 
@@ -61,7 +61,7 @@ Once the container is up, confirm Exhibitor is running:
         }
     ]
 
-_See Exhibitor's [wiki](https://github.com/Netflix/exhibitor/wiki/REST-Introduction) for more details on its REST API._
+_See Exhibitor's [wiki](https://github.com/soabase/exhibitor/wiki/REST-Introduction) for more details on its REST API._
 
 You can also check Exhibitor's web UI at `http://<host>:8181/exhibitor/v1/ui/index.html`
 
@@ -108,7 +108,7 @@ Starting the container:
         -e S3_BUCKET=<bucket> \
         -e S3_PREFIX=<key_prefix> \
         -e HOSTNAME=<host> \
-        simenduev/zookeeper-exhibitor:latest
+        bringg/zookeeper-exhibitor:latest
 
 ### Google Cloud Storage
 
@@ -123,4 +123,4 @@ After everything is in place, this is how you start the container with GCS suppo
         -e GS_PREFIX=<key_prefix> \
         -e HOSTNAME=<host> \
         -v <path to json file>:/opt/exhibitor/key-file.json \
-        simenduev/zookeeper-exhibitor
+        bringg/zookeeper-exhibitor
