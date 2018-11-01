@@ -16,8 +16,9 @@ The fork add support for the following:
 * Allow to specify settling-period (`ZK_SETTLING_PERIOD`)
 
 ### Versions
-* Exhibitor 1.7.0
-* ZooKeeper 3.4.10
+
+* Exhibitor 1.7.1
+* ZooKeeper 3.4.13
 
 ### Usage
 The container expects the following environment variables to be passed in:
@@ -54,9 +55,9 @@ Once the container is up, confirm Exhibitor is running:
     $ curl -s localhost:8181/exhibitor/v1/cluster/status | python -m json.tool
     [
         {
-            "code": 3, 
-            "description": "serving", 
-            "hostname": "<host>", 
+            "code": 3,
+            "description": "serving",
+            "hostname": "<host>",
             "isLeader": true
         }
     ]
@@ -74,7 +75,7 @@ Then confirm ZK is available:
 
 Exhibitor can also use an IAM Role attached to an instance instead of passing access or secret keys. This is an example policy that would be needed for the instance:
 
-```
+```json
 {
     "Statement": [
         {
