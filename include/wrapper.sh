@@ -1,4 +1,4 @@
-#! /bin/bash -e
+#!/bin/bash -e
 # Generates the default exhibitor config and launches exhibitor
 #
 DEFAULT_AWS_REGION="us-east-1"
@@ -91,9 +91,10 @@ exec 2>&1
 
 mkdir -p $ZK_DATA_DIR $ZK_LOG_DIR
 
-java -jar /opt/exhibitor/exhibitor.jar \
-  --port 8181 --defaultconfig /opt/exhibitor/defaults.conf \
+exec java -jar /opt/exhibitor/exhibitor.jar \
+  --defaultconfig /opt/exhibitor/defaults.conf \
+  --hostname ${HOSTNAME} \
+  --port 8181 \
   ${BACKUP_CONFIG} \
   ${HTTP_PROXY} \
-  --hostname ${HOSTNAME} \
   ${SECURITY}

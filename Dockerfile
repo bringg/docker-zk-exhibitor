@@ -6,7 +6,7 @@ RUN apk add --no-cache git musl-dev \
 # build exhibitor
 FROM maven:3.5-alpine as exhibitor
 
-ARG EXHIBITOR_VERSION="1.7.0"
+ARG EXHIBITOR_VERSION="1.7.1"
 ENV EXHIBITOR_RELEASE="https://github.com/soabase/exhibitor/archive/exhibitor-$EXHIBITOR_VERSION.tar.gz"
 
 RUN wget -qO- $EXHIBITOR_RELEASE | tar -xvz -C / \
@@ -19,13 +19,13 @@ RUN wget -qO- $EXHIBITOR_RELEASE | tar -xvz -C / \
 FROM openjdk:8-jdk-alpine
 LABEL maintainer "Bringg DevOps <devops@bringg.com>"
 
-ARG EXHIBITOR_VERSION="1.7.0"
-ARG ZK_VERSION="3.4.10"
+ARG EXHIBITOR_VERSION="1.7.1"
+ARG ZK_VERSION="3.4.13"
 ENV ZK_RELEASE="http://www.apache.org/dist/zookeeper/zookeeper-$ZK_VERSION/zookeeper-$ZK_VERSION.tar.gz"
 
 RUN \
     # Install required packages
-    apk add --no-cache bash fuse \
+    apk add --no-cache bash fuse tini \
     \
     # Alpine doesn't have /opt dir
     && mkdir -p /opt \
@@ -43,4 +43,4 @@ COPY --from=exhibitor /exhibitor/exhibitor-standalone/src/main/resources/buildsc
 
 WORKDIR /opt/exhibitor
 EXPOSE 2181 2888 3888 8181
-ENTRYPOINT ["bash", "-ex", "/opt/exhibitor/wrapper.sh"]
+ENTRYPOINT ["/sbin/tini", "-g", "--", "/opt/exhibitor/wrapper.sh"]
