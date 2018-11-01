@@ -21,6 +21,7 @@ The fork add support for the following:
 * ZooKeeper 3.4.13
 
 ### Usage
+
 The container expects the following environment variables to be passed in:
 
 * `HOSTNAME` - addressable hostname for this node (Exhibitor will forward users of the UI to this address)
@@ -30,10 +31,11 @@ The container expects the following environment variables to be passed in:
 * `S3_PREFIX` - (optional) key prefix within `S3_BUCKET` to use for this cluster
 * `AWS_ACCESS_KEY_ID` - (optional) AWS access key ID with read/write permissions on `S3_BUCKET`
 * `AWS_SECRET_ACCESS_KEY` - (optional) secret key for `AWS_ACCESS_KEY_ID`
-* `AWS_REGION` - (optional) the AWS region of the S3 bucket (defaults to `us-west-2`)
+* `AWS_REGION` - (optional) the AWS region of the S3 bucket (defaults to `us-east-1`)
 * `ZK_PASSWORD` - (optional) the HTTP Basic Auth password for the "zk" user
 * `ZK_DATA_DIR` - (optional) Zookeeper data directory
 * `ZK_LOG_DIR` - (optional) Zookeeper log directory
+* `ZK_APPLY_ALL_AT_ONCE` - (optional) If non zero, will make config changes all at once. Default 0
 * `ZK_SETTLING_PERIOD` - (optional) How long in ms to wait for the Ensemble to settle. Default 2 minutes
 * `HTTP_PROXY_HOST` - (optional) HTTP Proxy hostname
 * `HTTP_PROXY_PORT` - (optional) HTTP Proxy port

@@ -4,17 +4,20 @@
 DEFAULT_AWS_REGION="us-east-1"
 DEFAULT_DATA_DIR="/opt/zookeeper/data/snapshots"
 DEFAULT_LOG_DIR="/opt/zookeeper/data/transactions"
+DEFAULT_ZK_APPLY_ALL_AT_ONCE=0
 DEFAULT_ZK_ENSEMBLE_SIZE=0
 DEFAULT_ZK_SETTLING_PERIOD=120000
+
 HTTP_PROXY=""
-MISSING_VAR_MESSAGE="must be set"
 S3_SECURITY=""
+
 : ${AWS_REGION:=$DEFAULT_AWS_REGION}
-: ${HOSTNAME:?$MISSING_VAR_MESSAGE}
+: ${HOSTNAME:?"must be set"}
 : ${HTTP_PROXY_HOST:=""}
 : ${HTTP_PROXY_PASSWORD:=""}
 : ${HTTP_PROXY_PORT:=""}
 : ${HTTP_PROXY_USERNAME:=""}
+: ${ZK_APPLY_ALL_AT_ONCE:=$DEFAULT_ZK_APPLY_ALL_AT_ONCE}
 : ${ZK_DATA_DIR:=$DEFAULT_DATA_DIR}
 : ${ZK_ENSEMBLE_SIZE:=$DEFAULT_ZK_ENSEMBLE_SIZE}
 : ${ZK_LOG_DIR:=$DEFAULT_LOG_DIR}
@@ -24,6 +27,7 @@ cat <<- EOF > /opt/exhibitor/defaults.conf
     auto-manage-instances-fixed-ensemble-size=$ZK_ENSEMBLE_SIZE
     auto-manage-instances-settling-period-ms=$ZK_SETTLING_PERIOD
     auto-manage-instances=1
+    auto-manage-instances-apply-all-at-once=$ZK_APPLY_ALL_AT_ONCE
     backup-max-store-ms=21600000
     backup-period-ms=600000
     check-ms=30000
