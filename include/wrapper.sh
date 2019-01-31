@@ -31,7 +31,7 @@ cat <<- EOF > /opt/exhibitor/defaults.conf
     backup-max-store-ms=21600000
     backup-period-ms=600000
     check-ms=30000
-    cleanup-max-files=20
+    cleanup-max-files=3
     cleanup-period-ms=300000
     client-port=2181
     connect-port=2888
