@@ -1,10 +1,10 @@
 # build gcsfuse
-FROM golang:1.10-alpine as gcsfuse
+FROM golang:1.15-alpine as gcsfuse
 RUN apk add --no-cache git musl-dev \
     && go get -v -u github.com/googlecloudplatform/gcsfuse
 
 # build exhibitor
-FROM maven:3.5-alpine as exhibitor
+FROM maven:3.6-alpine as exhibitor
 
 ARG EXHIBITOR_VERSION="1.7.1"
 ENV EXHIBITOR_RELEASE="https://github.com/soabase/exhibitor/archive/exhibitor-$EXHIBITOR_VERSION.tar.gz"
@@ -20,8 +20,8 @@ FROM openjdk:8-jdk-alpine
 LABEL maintainer "Bringg DevOps <devops@bringg.com>"
 
 ARG EXHIBITOR_VERSION="1.7.1"
-ARG ZK_VERSION="3.4.13"
-ENV ZK_RELEASE="http://www.apache.org/dist/zookeeper/zookeeper-$ZK_VERSION/zookeeper-$ZK_VERSION.tar.gz"
+ARG ZK_VERSION="3.4.14"
+ENV ZK_RELEASE="http://archive.apache.org/dist/zookeeper/zookeeper-$ZK_VERSION/zookeeper-$ZK_VERSION.tar.gz"
 
 RUN \
     # Install required packages
@@ -32,7 +32,7 @@ RUN \
     \
     # Install ZK
     && wget -qO- $ZK_RELEASE | tar -xvz -C /opt \
-    && ln -s /opt/zookeeper-* /opt/zookeeper
+    && ln -s /opt/zookeeper-$ZK_VERSION /opt/zookeeper
 
 # Add the optional web.xml for authentication and the wrapper script to setup configs
 COPY include/ /opt/exhibitor/
