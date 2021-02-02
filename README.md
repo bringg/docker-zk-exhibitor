@@ -18,7 +18,7 @@ The fork add support for the following:
 ### Versions
 
 * Exhibitor 1.7.1
-* ZooKeeper 3.4.13
+* ZooKeeper 3.4.14
 
 ### Usage
 
@@ -32,11 +32,12 @@ The container expects the following environment variables to be passed in:
 * `AWS_ACCESS_KEY_ID` - (optional) AWS access key ID with read/write permissions on `S3_BUCKET`
 * `AWS_SECRET_ACCESS_KEY` - (optional) secret key for `AWS_ACCESS_KEY_ID`
 * `AWS_REGION` - (optional) the AWS region of the S3 bucket (defaults to `us-east-1`)
-* `ZK_PASSWORD` - (optional) the HTTP Basic Auth password for the "zk" user
+* `ZK_APPLY_ALL_AT_ONCE` - (optional) If non zero, will make config changes all at once. Default 0
 * `ZK_DATA_DIR` - (optional) Zookeeper data directory
 * `ZK_LOG_DIR` - (optional) Zookeeper log directory
-* `ZK_APPLY_ALL_AT_ONCE` - (optional) If non zero, will make config changes all at once. Default 0
+* `ZK_PASSWORD` - (optional) the HTTP Basic Auth password for the "zk" user
 * `ZK_SETTLING_PERIOD` - (optional) How long in ms to wait for the Ensemble to settle. Default 2 minutes
+* `ZK_ENABLE_LOGS_BACKUP` - (optional) If true, enables backup of ZooKeeper log files. Default true
 * `HTTP_PROXY_HOST` - (optional) HTTP Proxy hostname
 * `HTTP_PROXY_PORT` - (optional) HTTP Proxy port
 * `HTTP_PROXY_USERNAME` - (optional) HTTP Proxy username

@@ -5,6 +5,7 @@ DEFAULT_AWS_REGION="us-east-1"
 DEFAULT_DATA_DIR="/opt/zookeeper/data/snapshots"
 DEFAULT_LOG_DIR="/opt/zookeeper/data/transactions"
 DEFAULT_ZK_APPLY_ALL_AT_ONCE=0
+DEFAULT_ZK_ENABLE_LOGS_BACKUP=true
 DEFAULT_ZK_ENSEMBLE_SIZE=0
 DEFAULT_ZK_SETTLING_PERIOD=120000
 
@@ -19,6 +20,7 @@ S3_SECURITY=""
 : ${HTTP_PROXY_USERNAME:=""}
 : ${ZK_APPLY_ALL_AT_ONCE:=$DEFAULT_ZK_APPLY_ALL_AT_ONCE}
 : ${ZK_DATA_DIR:=$DEFAULT_DATA_DIR}
+: ${ZK_ENABLE_LOGS_BACKUP:=DEFAULT_ZK_ENABLE_LOGS_BACKUP}
 : ${ZK_ENSEMBLE_SIZE:=$DEFAULT_ZK_ENSEMBLE_SIZE}
 : ${ZK_LOG_DIR:=$DEFAULT_LOG_DIR}
 : ${ZK_SETTLING_PERIOD:=$DEFAULT_ZK_SETTLING_PERIOD}
@@ -54,10 +56,10 @@ fi
 
 if [[ -n ${S3_BUCKET} ]]; then
     echo "backup-extra=throttle\=&bucket-name\=${S3_BUCKET}&key-prefix\=${S3_PREFIX}&max-retries\=4&retry-sleep-ms\=30000" >> /opt/exhibitor/defaults.conf
-    BACKUP_CONFIG="--configtype s3 --s3config ${S3_BUCKET}:${S3_PREFIX} ${S3_SECURITY} --s3region ${AWS_REGION} --s3backup true"
+    BACKUP_CONFIG="--configtype s3 --s3config ${S3_BUCKET}:${S3_PREFIX} ${S3_SECURITY} --s3region ${AWS_REGION} --s3backup ${ZK_ENABLE_LOGS_BACKUP}"
 else
     echo "backup-extra=directory\=/opt/zookeeper/local_configs" >> /opt/exhibitor/defaults.conf
-    BACKUP_CONFIG="--configtype file --fsconfigdir /opt/zookeeper/local_configs --filesystembackup true"
+    BACKUP_CONFIG="--configtype file --fsconfigdir /opt/zookeeper/local_configs --filesystembackup ${ZK_ENABLE_LOGS_BACKUP}"
 
     mkdir -p /opt/zookeeper/local_configs
 
